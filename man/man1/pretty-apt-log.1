@@ -1,0 +1,134 @@
+.TH PRETTY-APT-LOG 1 2023 PRETTY-APT-LOG\ 0.1.0
+
+.SH NAME
+pretty-apt-log \- view APT logs in an easy-to-read format
+
+.SH SYNOPSIS
+.SY
+\fBpretty-apt-log\fR [<options>] [<log> ...]
+.YS
+
+.SH DESCRIPTION
+\fBpretty-apt-log\fR allows the user to quickly view APT package manager's logs in an easy-to-read format. Each entry includes a date/time range showing the start and end time of the installation, and the command that was run.
+
+\fBpretty-apt-log\fR requires `bat` to be installed to colorize the output.
+
+If no <log> file is passed as an argument, all the available logs in `/var/log/apt` are concatenated together, and displayed in the output. This includes the `history.log` file, and the numbered `history.log.<number>.gz` archive files.
+
+Otherwise, both `.gz` files and plain text log files can be passed as arguments to \fBpretty-apt-log\fR. In that case, only the information from those files, concatenated together, is displayed.
+
+.SH OPTIONS
+
+.TP
+.B -i, --os-installer
+Show entries of installs that were done by the OS installer.
+
+.TP
+.B -I, --no-os-installer
+Do not show entries of installs that were done by the OS installer. This is the default.
+
+.TP
+.B -u, --user
+Show username of the user who requested the install.
+
+.TP
+.B -U, --no-user
+Do not show username of the user who requested the install. This is the default.
+
+.TP
+.B -n, --user-uid
+Show UID of the user next to the username.
+
+.TP
+.B -N, --user-no-uid
+Do not show UID of the user next to the username. This is the default.
+
+.TP
+.B -d, --details
+Show a detailed report about the packages that were installed during each session.
+
+.TP
+.B -D, --no-details
+Do not show a detailed report about the packages that were installed during each session. This is the default.
+
+.TP
+.B -a, --details-current-architecture
+Always show a full name of the package in the detailed report, including the architecture \- even if the package's architecture matches the current machine architecture. Current machine architecture can be found out by running `dpkg --print-architecture`.
+
+.TP
+.B -A, --details-no-current-architecture
+Do not show the architecture in the name of a package in the detailed report if the architecture matches the current machine architecture. This is the default.
+
+.TP
+.B -f, --date-format\fR=<value>
+Date format string that changes how date/time is displayed in the output. This is the same as the \fIFORMAT\fR string of the `date` command. See \fBdate\fR(1) for more details.
+
+The default value is `%Y/%m/%d %H:%M:%S`.
+
+.TP
+.B -z, --date-timezone\fR=<value>
+Change the timezone in which date/time is displayed in the output.
+
+The default value is current system timezone (the output of `date +%Z`).
+
+.TP
+.B -b, --bat-theme\fR=<value>
+Change the bat theme that is used to colorized the output. The default value is `OneHalfDark`.
+
+If this value is set to an empty string, bat's currently configured theme will be used.
+
+See `bat --list-themes` for a list of available themes. Note that on Debian, bat's binary is called `batcat` instead of `bat`.
+
+.TP
+.B -p, --pager\fR[=<value>]
+Use a pager to display the output.
+
+<value> can be \fIalways\fR, \fIauto\fR, or \fInever\fR. No specified <value> is equivalent to \fIalways\fR. \fInever\fR is equivalent to \fB--no-pager\fR, which is also the default.
+
+.TP
+.B -P, --no-pager
+Do not use a pager to display the output. This is the default.
+
+.TP
+.B -e, --pager-scroll-to-end
+Scroll to the end of the output when opening a pager.
+
+.TP
+.B -E, --no-pager-scroll-to-end
+Do not scroll to the end of the output when opening a pager. This is the default.
+
+.TP
+.B -c, --color
+Colorize the output. This is the default if bat is installed.
+
+.TP
+.B -C, --no-color
+Disable colorization of the output. If bat is not installed, this is the default.
+
+.TP
+.B -h, --help
+Print help.
+
+.TP
+.B -V, --version
+Print version information.
+
+.SH FILES
+
+A configuration file can be used to set default options.
+
+The configuration file's location is \fI$XDG_CONFIG_HOME/pretty-apt-log/config.bash\fR. If \fIXDG_CONFIG_HOME\fR is not set, it defaults to \fI~/.config\fR.
+
+.SH AUTHOR
+
+Alex Rogers <https://github.com/linguisticmind>
+
+.SH HOMEPAGE
+
+<https://github.com/linguisticmind/pretty-apt-log>
+
+.SH COPYRIGHT
+
+Copyright © 2023 Alex Rogers. License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+
+This is free software: you are free to change and redistribute it. There is NO WARRANTY, to the extent permitted by law.

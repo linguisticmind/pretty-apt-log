@@ -1,0 +1,293 @@
+#!/usr/bin/env bash
+
+# pretty-apt-log - view APT logs in an easy-to-read format
+# copyright (c) 2023  Alex Rogers (https://github.com/linguisticmind)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+version=0.1.0
+
+function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$/[]/\\&/g'; }
+
+getopt -T > /dev/null
+[[ $? != 4 ]] && { printf '%s\n' '['"${BASH_SOURCE##*/}"'] Enhanced getopt is required to run this script' >&2; exit 1; }
+
+help='pretty-apt-log [<options>] [<log> ...]
+
+-i, --os-installer                     Show entries of installs that were done 
+                                       by the OS installer.
+
+-I, --no-os-installer                  Do not show entries of installs that 
+                                       were done by the OS installer.
+
+-u, --user                             Show username of the user who requested 
+                                       the install.
+
+-U, --no-user                          Do not show username of the user who 
+                                       requested the install.
+
+-n, --user-uid                         Show UID of the user next to the 
+                                       username.
+
+-N, --user-no-uid                      Do not show UID of the user next to the 
+                                       username.
+
+-d, --details                          Show a detailed report about the 
+                                       packages that were installed during each 
+                                       session.
+
+-D, --no-details                       Do not show a detailed report about the 
+                                       packages that were installed during each 
+                                       session.
+
+-a, --details-current-architecture     Always show a full name of the package 
+                                       in the detailed report, including the 
+                                       architecture - even if the package'\''s 
+                                       architecture matches the current machine 
+                                       architecture.
+
+-A, --details-no-current-architecture  Do not show the architecture in the name 
+                                       of a package in the detailed report if 
+                                       the architecture matches the current 
+                                       machine architecture.
+
+-f, --date-format=<value>              Date format string that changes how 
+                                       date/time is displayed in the output.
+
+-z, --date-timezone=<value>            Change the timezone in which date/time 
+                                       is displayed in the output.
+
+-b, --bat-theme=<value>                Change the bat theme that is used to 
+                                       colorized the output.
+
+-p, --pager[={always|auto|never}]      Use a pager to display the output.
+
+-P, --no-pager                         Do not use a pager to display the output.
+
+-e, --pager-scroll-to-end              Scroll to the end of the output when 
+                                       opening a pager.
+
+-E, --no-pager-scroll-to-end           Do not scroll to the end of the output 
+                                       when opening a pager.
+
+-c, --color                            Colorize the output.
+
+-C, --no-color                         Disable colorization of the output.
+
+-h, --help                             Print help.
+
+-V, --version                          Print version information.
+'
+
+opts=$(getopt -n "${BASH_SOURCE##*/}" -o 'i,I,u,U,n,N,d,D,a,A,f:,z:,t:,p::,P,e,E,c,C,h,V,' -l 'os-installer,no-os-installer,user,no-user,user-uid,user-no-uid,details,no-details,details-current-architecture,details-no-current-architecture,date-format:,date-timezone:,bat-theme:,pager::,no-pager,pager-scroll-to-end,no-pager-scroll-to-end,color,no-color,help,version,' -- "$@")
+
+[[ $? != 0 ]] && exit 1
+
+eval set -- $opts
+
+opt_os_installer=
+opt_user=
+opt_user_uid=
+opt_details=
+opt_details_current_architecture=
+opt_date_format='%Y/%m/%d %H:%M:%S'
+opt_date_timezone=$(date '+%Z')
+opt_bat_theme='OneHalfDark'
+opt_pager='never'
+opt_pager_scroll_to_end=
+opt_color=1
+
+test -f "${XDG_CONFIG_HOME:-$HOME/.config}"/pretty-apt-log/config.bash && source "$_"
+
+while true; do
+  case $1 in
+    -i | --os-installer ) opt_os_installer=1; shift ;;
+    -I | --no-os-installer ) opt_os_installer=; shift ;;
+    -u | --user ) opt_user=1; shift ;;
+    -U | --no-user ) opt_user=; shift ;;
+    -n | --user-uid ) opt_user_uid=1; shift ;;
+    -N | --user-no-uid ) opt_user_uid=; shift ;;
+    -d | --details ) opt_details=1; shift ;;
+    -D | --no-details ) opt_details=; shift ;;
+    -a | --details-current-architecture ) opt_details_current_architecture=1; shift ;;
+    -A | --details-no-current-architecture ) opt_details_current_architecture=; shift ;;
+    -f | --date-format ) opt_date_format="$2"; shift 2 ;;
+    -z | --date-timezone ) opt_date_timezone="$2"; shift 2 ;;
+    -t | --bat-theme ) opt_bat_theme="$2"; shift 2 ;;
+    -p | --pager )
+      opt_pager="${2:-always}"
+      case $opt_pager in
+        auto | always | never ) ;;
+        * ) printf '%s\n' '['"${BASH_SOURCE##*/}"'] Invalid optional argument to `'"$1"'`: `'"$2"'`. Allowed values are: `always`, `auto`, `never`. No argument is equivalent to `always`.' >&2; exit 1 ;;
+      esac
+      shift 2
+    ;;
+    -P | --no-pager ) opt_pager='never'; shift ;;
+    -e | --pager-scroll-to-end ) opt_pager_scroll_to_end=1; shift ;;
+    -E | --no-pager-scroll-to-end ) opt_pager_scroll_to_end=; shift ;;
+    -c | --color ) opt_color=1; shift ;;
+    -C | --no-color ) opt_color=; shift ;;
+    -h | --help ) printf '%s\n' "$help"; exit ;;
+    -V | --version ) printf '%s\n' "$version"; exit ;;
+    -- ) shift; break ;;
+    * ) printf '%s\n' '['"${BASH_SOURCE##*/}"'] Internal error: unable to parse option `'"$1"'`' >&2; exit 1 ;;
+  esac
+done
+
+opt_date_format=$(re_esc "$opt_date_format")
+opt_date_timezone=$(re_esc "$opt_date_timezone")
+
+current_architecture=$(dpkg --print-architecture)
+[[ ! $opt_details_current_architecture ]] && opt_details_no_current_architecture=1 
+
+sed_script='
+
+  /^Start-Date:/ {
+    :a
+    /^Start-Date:/ {
+      s/^Start-Date: (.*)/TZ='\'"${opt_date_timezone//\'/\'\\\'\'}"\'' date +'\'"${opt_date_format//\'/\'\\\'\'}"\'' --date '\''\1 utc'\''/e
+      H
+    }
+    /^Commandline:/ {
+      s/^Commandline: (.*)/\1/
+      H
+    }
+'
+
+[[ $opt_user ]] && sed_script+='
+    /^Requested-By:/ {
+      s/(Requested-By: .*) \((.*)\)/\1 '${opt_user_uid:+'(\2) '}'~ /
+      H
+    }
+'
+
+[[ $opt_details ]] && sed_script+='
+    /^Install:/ {
+      s/Install: //
+      s/\), /)\n/g
+      s/^(.*)'${opt_details_no_current_architecture:+':'"$current_architecture"}' \(([^ ]*)(, ([^ ]*))?\)$/# \1\t\2\t\4/gm
+      s/'\''/'\''\\'\'\''/g
+      s/.*/printf '\''# +++ Install +++\n%s\n# ~~~ Install ~~~'\'' "&" | column --keep-empty-lines --table --separator '\''\t'\''/e
+      H
+    }
+    /^Upgrade:/ {
+      s/Upgrade: //
+      s/\), /)\n/g
+      s/^(.*)'${opt_details_no_current_architecture:+':'"$current_architecture"}' \(([^ ]*)(, ([^ ]*))\)$/# \1\t\2 -> \4/gm
+      s/'\''/'\''\\'\'\''/g
+      s/.*/printf '\''# +++ Upgrade +++\n%s\n# ~~~ Upgrade ~~~'\'' "&" | column --keep-empty-lines --table --separator '\''\t'\''/e
+      H
+    }
+    /^Remove:/ {
+      s/Remove: //
+      s/\), /)\n/g
+      s/^(.*)'${opt_details_no_current_architecture:+':'"$current_architecture"}' \(([^ ]*)\)$/# \1\t\2/gm
+      s/'\''/'\''\\'\'\''/g
+      s/.*/printf '\''# +++ Remove +++\n%s\n# ~~~ Remove ~~~'\'' "&" | column --keep-empty-lines --table --separator '\''\t'\''/e
+      H
+    }
+'
+
+sed_script+='
+    /^End-Date:/ {
+      s/^End-Date: (.*)/TZ='\'"${opt_date_timezone//\'/\'\\\'\'}"\'' date +'\'"${opt_date_format//\'/\'\\\'\'}"\'' --date '\''\1 utc'\''/e
+      H
+    }
+    $ ! {
+    n
+      /^$/! {
+        b a
+      }
+    }
+    x
+    /^$/! {'
+
+[[ ! $opt_os_installer ]] && sed_script+='
+      /-o APT::/! {
+'
+
+if [[ ! $opt_user ]]; then
+
+sed_script+='
+        s/\`\n(.*)\n((.|\n)*)\n(.*)\'\''/# \1 - \4\n\2\n/mp
+'
+
+else
+
+sed_script+='
+        s/\`\n(.*)\n(.*)\n(^Requested-By: (.*)\n)?((.|\n)*\n)?(.*)\'\''/# \4\1 - \7\n\2\n\5/mp
+'
+
+fi
+
+[[ ! $opt_os_installer ]] && sed_script+='
+      }
+'
+
+sed_script+='
+    }
+  }
+
+'
+
+function bat_or_cat {
+
+  local bat_bin
+  for bat_bin in bat batcat; do
+    type -P "$bat_bin" > /dev/null && break
+    bat_bin=
+  done
+
+  function bat_run { "$bat_bin" --style=plain --color=never ${opt_color:+--color=always} --language=bash --theme="${opt_bat_theme//\'/\'\\\'\'}" "$@"; }
+
+  if [[ $bat_bin ]]; then
+    if [[ ! $opt_pager_scroll_to_end ]]; then
+      bat_run --paging="$opt_pager" -- "$@"
+    else
+      case $opt_pager in
+        auto ) bat_run --pager='less -RF +G' -- "$@" ;;
+        always ) bat_run --pager='less -R +G' -- "$@" ;;
+        never ) bat_run --paging=never -- "$@" ;;
+      esac
+    fi
+  else
+    case $opt_pager in
+      auto ) less -F ${opt_pager_scroll_to_end:++G} -- "$@" ;;
+      always ) less ${opt_pager_scroll_to_end:++G} -- "$@" ;;
+      never ) cat -- "$@" ;;
+    esac
+  fi
+
+}
+
+if [[ $# = 0 ]]; then
+
+  sed -En "$sed_script" \
+    <(compgen -G '/var/log/apt/history.log.*.gz' && printf '%s\n' '/var/log/apt/history.log.'*'.gz' | sort --version-sort --reverse | xargs zcat) \
+    '/var/log/apt/history.log' | bat_or_cat
+
+else
+
+  for file; do
+
+    if [[ $file = *.gz ]]; then
+      zcat "$file"
+    else
+      cat "$file"
+    fi
+
+  done | sed -En "$sed_script" | bat_or_cat
+
+fi

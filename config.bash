@@ -1,0 +1,11 @@
+#opt_os_installer=
+#opt_user=
+#opt_user_uid=
+#opt_details=
+#opt_details_current_architecture=
+#opt_date_format='%Y/%m/%d %H:%M:%S'
+#opt_date_timezone=$(date '+%Z')
+#opt_bat_theme='OneHalfDark'
+#opt_pager='never'
+#opt_pager_scroll_to_end=
+#opt_color=1
