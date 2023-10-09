@@ -60,13 +60,13 @@ sudo apt install bat
 PRETTY-APT-LOG(1)           General Commands Manual          PRETTY-APT-LOG(1)
 
 NAME
-       pretty-apt-log - view apt logs in an easy-to-read format
+       pretty-apt-log - view APT logs in an easy-to-read format
 
 SYNOPSIS
         pretty-apt-log [<options>] [<log> ...]
 
 DESCRIPTION
-       pretty-apt-log  allows  the  user to quickly view apt package manager's
+       pretty-apt-log  allows  the  user to quickly view APT package manager's
        logs in an easy-to-read format. Each entry includes a  date/time  range
        showing  the  start  and  end time of the installation, and the command
        that was run.
