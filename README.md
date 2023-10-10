@@ -4,7 +4,7 @@
 
 A video tutorial:
 
-[![Mindful Technology - View APT logs conveniently with pretty-apt-log](https://img.youtube.com/vi/RWkfLKRoWWE/0.jpg)](https://www.youtube.com/watch?v=RWkfLKRoWWE)
+[![Mindful Technology - How to read APT logs + do it conveniently with pretty-apt-log](https://img.youtube.com/vi/RWkfLKRoWWE/0.jpg)](https://www.youtube.com/watch?v=RWkfLKRoWWE)
 
 ## Dependencies
 
