@@ -21,7 +21,7 @@ version=0.1.0
 function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$/[]/\\&/g'; }
 
 getopt -T > /dev/null
-[[ $? != 4 ]] && { printf '%s\n' '['"${BASH_SOURCE##*/}"'] Enhanced getopt is required to run this script' >&2; exit 1; }
+[[ $? != 4 ]] && { printf '[%s] %s\n' "${BASH_SOURCE##*/}" 'Enhanced getopt is required to run this script.' >&2; exit 1; }
 
 help='pretty-apt-log [<options>] [<log> ...]
 
@@ -94,7 +94,7 @@ opts=$(getopt -n "${BASH_SOURCE##*/}" -o 'i,I,u,U,n,N,d,D,a,A,f:,z:,t:,p::,P,e,E
 
 [[ $? != 0 ]] && exit 1
 
-eval set -- $opts
+eval set -- "$opts"
 
 opt_os_installer=
 opt_user=
@@ -141,7 +141,7 @@ while true; do
     -h | --help ) printf '%s\n' "$help"; exit ;;
     -V | --version ) printf '%s\n' "$version"; exit ;;
     -- ) shift; break ;;
-    * ) printf '%s\n' '['"${BASH_SOURCE##*/}"'] Internal error: unable to parse option `'"$1"'`' >&2; exit 1 ;;
+    * ) printf '[%s] %s\n' "${BASH_SOURCE##*/}" 'Internal error: unable to parse option `'"$1"'`.' >&2; exit 1 ;;
   esac
 done
 
