@@ -1,4 +1,4 @@
-.TH PRETTY-APT-LOG 1 2023 PRETTY-APT-LOG\ 0.1.0
+.TH PRETTY-APT-LOG 1 2024 PRETTY-APT-LOG\ 0.1.1
 
 .SH NAME
 pretty-apt-log \- view APT logs in an easy-to-read format
@@ -11,7 +11,7 @@ pretty-apt-log \- view APT logs in an easy-to-read format
 .SH DESCRIPTION
 \fBpretty-apt-log\fR allows the user to quickly view APT package manager's logs in an easy-to-read format. Each entry includes a date/time range showing the start and end time of the installation, and the command that was run.
 
-\fBpretty-apt-log\fR requires `bat` to be installed to colorize the output.
+\fBpretty-apt-log\fR requires `bat` to be installed to colorize the output. If `bat` is not installed, the output will not be colorized.
 
 If no <log> file is passed as an argument, all the available logs in `/var/log/apt` are concatenated together, and displayed in the output. This includes the `history.log` file, and the numbered `history.log.<number>.gz` archive files.
 

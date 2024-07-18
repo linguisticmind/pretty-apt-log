@@ -16,78 +16,92 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-version=0.1.0
+version=0.1.1
 
-function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$/[]/\\&/g'; }
+function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$\/[]/\\&/g'; }
 
 getopt -T > /dev/null
 [[ $? != 4 ]] && { printf '[%s] %s\n' "${BASH_SOURCE##*/}" 'Enhanced getopt is required to run this script.' >&2; exit 1; }
 
 help='pretty-apt-log [<options>] [<log> ...]
 
--i, --os-installer                     Show entries of installs that were done 
-                                       by the OS installer.
+-i, --os-installer
+        Show entries of installs that were done by the OS 
+        installer.
 
--I, --no-os-installer                  Do not show entries of installs that 
-                                       were done by the OS installer.
+-I, --no-os-installer
+        Do not show entries of installs that were done by 
+        the OS installer.
 
--u, --user                             Show username of the user who requested 
-                                       the install.
+-u, --user
+        Show username of the user who requested the install.
 
--U, --no-user                          Do not show username of the user who 
-                                       requested the install.
+-U, --no-user
+        Do not show username of the user who requested the 
+        install.
 
--n, --user-uid                         Show UID of the user next to the 
-                                       username.
+-n, --user-uid
+        Show UID of the user next to the username.
 
--N, --user-no-uid                      Do not show UID of the user next to the 
-                                       username.
+-N, --user-no-uid
+        Do not show UID of the user next to the username.
 
--d, --details                          Show a detailed report about the 
-                                       packages that were installed during each 
-                                       session.
+-d, --details
+        Show a detailed report about the packages that were 
+        installed during each session.
 
--D, --no-details                       Do not show a detailed report about the 
-                                       packages that were installed during each 
-                                       session.
+-D, --no-details
+        Do not show a detailed report about the packages 
+        that were installed during each session.
 
--a, --details-current-architecture     Always show a full name of the package 
-                                       in the detailed report, including the 
-                                       architecture - even if the package'\''s 
-                                       architecture matches the current machine 
-                                       architecture.
+-a, --details-current-architecture
+        Always show a full name of the package in the 
+        detailed report, including the architecture - even 
+        if the package'\''s architecture matches the current 
+        machine architecture.
 
--A, --details-no-current-architecture  Do not show the architecture in the name 
-                                       of a package in the detailed report if 
-                                       the architecture matches the current 
-                                       machine architecture.
+-A, --details-no-current-architecture
+        Do not show the architecture in the name of a 
+        package in the detailed report if the architecture 
+        matches the current machine architecture.
 
--f, --date-format=<value>              Date format string that changes how 
-                                       date/time is displayed in the output.
+-f, --date-format=<value>
+        Date format string that changes how date/time is 
+        displayed in the output.
 
--z, --date-timezone=<value>            Change the timezone in which date/time 
-                                       is displayed in the output.
+-z, --date-timezone=<value>
+        Change the timezone in which date/time is displayed 
+        in the output.
 
--b, --bat-theme=<value>                Change the bat theme that is used to 
-                                       colorized the output.
+-b, --bat-theme=<value>
+        Change the bat theme that is used to colorize the 
+        output.
 
--p, --pager[={always|auto|never}]      Use a pager to display the output.
+-p, --pager[=<value>]
+        Use a pager to display the output.
 
--P, --no-pager                         Do not use a pager to display the output.
+-P, --no-pager
+        Do not use a pager to display the output.
 
--e, --pager-scroll-to-end              Scroll to the end of the output when 
-                                       opening a pager.
+-e, --pager-scroll-to-end
+        Scroll to the end of the output when opening a 
+        pager.
 
--E, --no-pager-scroll-to-end           Do not scroll to the end of the output 
-                                       when opening a pager.
+-E, --no-pager-scroll-to-end
+        Do not scroll to the end of the output when opening 
+        a pager.
 
--c, --color                            Colorize the output.
+-c, --color
+        Colorize the output.
 
--C, --no-color                         Disable colorization of the output.
+-C, --no-color
+        Disable colorization of the output.
 
--h, --help                             Print help.
+-h, --help
+        Print help.
 
--V, --version                          Print version information.
+-V, --version
+        Print version information.
 '
 
 opts=$(getopt -n "${BASH_SOURCE##*/}" -o 'i,I,u,U,n,N,d,D,a,A,f:,z:,t:,p::,P,e,E,c,C,h,V,' -l 'os-installer,no-os-installer,user,no-user,user-uid,user-no-uid,details,no-details,details-current-architecture,details-no-current-architecture,date-format:,date-timezone:,bat-theme:,pager::,no-pager,pager-scroll-to-end,no-pager-scroll-to-end,color,no-color,help,version,' -- "$@")

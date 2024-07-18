@@ -6,15 +6,61 @@ A video tutorial:
 
 [![Mindful Technology - How to read APT logs + do it conveniently with pretty-apt-log](https://img.youtube.com/vi/RWkfLKRoWWE/0.jpg)](https://www.youtube.com/watch?v=RWkfLKRoWWE)
 
+## Changelog
+
+<table>
+    <tr>
+        <th>Version</th>
+        <th>Date</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>
+            <a href="https://github.com/linguisticmind/pretty-apt-log/releases/tag/v0.1.1">0.1.1</a>
+        </td>
+        <td>
+           2024-07-18
+        </td>
+        <td>
+            <p>
+                Updated the <code>re_esc</code> function, which previously did not escape backslashes (<code>&bsol;</code>) for use in regular expressions.
+            </p>
+            <p>
+                Improved formatting of the built-in help message.
+            </p>
+            <p>
+                Added CHANGELOG.
+            </p>
+            <p>
+                Updated the 'Dependencies' section in README.
+            </p>
+            <p>
+                Miscellaneous stylistic and formatting updates to README, man page, and the main script.
+            </p>
+        </td>
+    </tr>
+</table>
+
+[Read more](CHANGELOG.md)
+
 ## Dependencies
 
-[`bat`](https://github.com/sharkdp/bat) is required to enable colorization of the output.
+### bat
 
-Install it with
+`pretty-apt-log` requires [`bat`](https://github.com/sharkdp/bat) to be installed to enable colorization of the output. If `bat` is not installed, colorization of the output will not be available.
 
-```bash
-sudo apt install bat
-```
+On Debian, run `sudo apt install bat` to install it.
+
+Note that on Debian, `bat`'s executable is [called `batcat` instead of `bat`](https://github.com/sharkdp/bat/issues/982).
+
+### Other
+
+`pretty-apt-log` was written and tested on Debian 12, and takes advantage of standard utilities that come with the system. In order to run `pretty-apt-log` on other systems, make sure that the following are installed and available on system's `PATH`:
+
+* Bash >= 5.2.15
+* Enhanced getopt
+* GNU coreutils
+* GNU sed
 
 ## Installation
 
@@ -71,15 +117,16 @@ DESCRIPTION
        showing  the  start  and  end time of the installation, and the command
        that was run.
 
-       pretty-apt-log requires `bat` to be installed to colorize the output.
+       pretty-apt-log requires `bat` to be installed to colorize  the  output.
+       If `bat` is not installed, the output will not be colorized.
 
-       If no <log> file is passed as an argument, all the  available  logs  in
-       `/var/log/apt`  are concatenated together, and displayed in the output.
-       This  includes  the  `history.log`  file,  and   the   numbered   `his‐
+       If  no  <log>  file is passed as an argument, all the available logs in
+       `/var/log/apt` are concatenated together, and displayed in the  output.
+       This   includes   the   `history.log`  file,  and  the  numbered  `his‐
        tory.log.<number>.gz` archive files.
 
-       Otherwise,  both  `.gz` files and plain text log files can be passed as
-       arguments to pretty-apt-log. In that case, only  the  information  from
+       Otherwise, both `.gz` files and plain text log files can be  passed  as
+       arguments  to  pretty-apt-log.  In that case, only the information from
        those files, concatenated together, is displayed.
 
 OPTIONS
@@ -87,7 +134,7 @@ OPTIONS
               Show entries of installs that were done by the OS installer.
 
        -I, --no-os-installer
-              Do  not  show  entries  of installs that were done by the OS in‐
+              Do not show entries of installs that were done  by  the  OS  in‐
               staller. This is the default.
 
        -u, --user
@@ -101,58 +148,58 @@ OPTIONS
               Show UID of the user next to the username.
 
        -N, --user-no-uid
-              Do  not  show  UID of the user next to the username. This is the
+              Do not show UID of the user next to the username.  This  is  the
               default.
 
        -d, --details
-              Show a detailed report about the packages  that  were  installed
+              Show  a  detailed  report about the packages that were installed
               during each session.
 
        -D, --no-details
-              Do  not  show a detailed report about the packages that were in‐
+              Do not show a detailed report about the packages that  were  in‐
               stalled during each session. This is the default.
 
        -a, --details-current-architecture
-              Always show a full name of the package in the  detailed  report,
-              including  the architecture - even if the package's architecture
+              Always  show  a full name of the package in the detailed report,
+              including the architecture - even if the package's  architecture
               matches the current machine architecture. Current machine archi‐
               tecture can be found out by running `dpkg --print-architecture`.
 
        -A, --details-no-current-architecture
               Do not show the architecture in the name of a package in the de‐
-              tailed report if the architecture matches  the  current  machine
+              tailed  report  if  the architecture matches the current machine
               architecture. This is the default.
 
        -f, --date-format=<value>
-              Date  format  string  that changes how date/time is displayed in
-              the output. This is the same as the FORMAT string of the  `date`
+              Date format string that changes how date/time  is  displayed  in
+              the  output. This is the same as the FORMAT string of the `date`
               command. See date(1) for more details.
 
               The default value is `%Y/%m/%d %H:%M:%S`.
 
        -z, --date-timezone=<value>
-              Change  the timezone in which date/time is displayed in the out‐
+              Change the timezone in which date/time is displayed in the  out‐
               put.
 
-              The default value is current  system  timezone  (the  output  of
+              The  default  value  is  current  system timezone (the output of
               `date +%Z`).
 
        -b, --bat-theme=<value>
-              Change  the  bat theme that is used to colorized the output. The
+              Change the bat theme that is used to colorize  the  output.  The
               default value is `OneHalfDark`.
 
               If this value is set to an empty string, bat's currently config‐
               ured theme will be used.
 
-              See  `bat  --list-themes`  for  a list of available themes. Note
-              that on Debian, bat's  binary  is  called  `batcat`  instead  of
+              See `bat --list-themes` for a list  of  available  themes.  Note
+              that  on  Debian,  bat's  binary  is  called `batcat` instead of
               `bat`.
 
        -p, --pager[=<value>]
               Use a pager to display the output.
 
-              <value>  can  be always, auto, or never. No specified <value> is
-              equivalent to always. never is equivalent to  --no-pager,  which
+              <value> can be always, auto, or never. No specified  <value>  is
+              equivalent  to  always. never is equivalent to --no-pager, which
               is also the default.
 
        -P, --no-pager
@@ -162,14 +209,14 @@ OPTIONS
               Scroll to the end of the output when opening a pager.
 
        -E, --no-pager-scroll-to-end
-              Do  not  scroll  to  the end of the output when opening a pager.
+              Do not scroll to the end of the output  when  opening  a  pager.
               This is the default.
 
        -c, --color
               Colorize the output. This is the default if bat is installed.
 
        -C, --no-color
-              Disable colorization of the output. If  bat  is  not  installed,
+              Disable  colorization  of  the  output. If bat is not installed,
               this is the default.
 
        -h, --help
@@ -181,8 +228,8 @@ OPTIONS
 FILES
        A configuration file can be used to set default options.
 
-       The   configuration  file's  location  is  $XDG_CONFIG_HOME/pretty-apt-
-       log/config.bash. If XDG_CONFIG_HOME is not set, it defaults to  ~/.con‐
+       The  configuration  file's  location  is   $XDG_CONFIG_HOME/pretty-apt-
+       log/config.bash.  If XDG_CONFIG_HOME is not set, it defaults to ~/.con‐
        fig.
 
 AUTHOR
@@ -192,13 +239,13 @@ HOMEPAGE
        <https://github.com/linguisticmind/pretty-apt-log>
 
 COPYRIGHT
-       Copyright  ©  2023  Alex  Rogers.  License GPLv3+: GNU GPL version 3 or
+       Copyright © 2023 Alex Rogers. License GPLv3+:  GNU  GPL  version  3  or
        later <https://gnu.org/licenses/gpl.html>.
 
-       This is free software: you are free  to  change  and  redistribute  it.
+       This  is  free  software:  you  are free to change and redistribute it.
        There is NO WARRANTY, to the extent permitted by law.
 
-PRETTY-APT-LOG 0.1.0                 2023                    PRETTY-APT-LOG(1)
+PRETTY-APT-LOG 0.1.1                 2024                    PRETTY-APT-LOG(1)
 ```
 
 ## License
