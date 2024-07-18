@@ -1,6 +1,6 @@
 # pretty-apt-log
 
-`pretty-apt-log` is a bash script that allows you to view logs of the `apt` package manager in an easy-to-read format.
+`pretty-apt-log` is a Bash script that allows you to view logs of the `apt` package manager in an easy-to-read format.
 
 A video tutorial:
 
