@@ -6,6 +6,8 @@ A video tutorial:
 
 [![Mindful Technology - How to read APT logs + do it conveniently with pretty-apt-log](https://img.youtube.com/vi/RWkfLKRoWWE/0.jpg)](https://www.youtube.com/watch?v=RWkfLKRoWWE)
 
+<a href='https://ko-fi.com/linguisticmind'><img src='https://github.com/linguisticmind/linguisticmind/raw/master/res/kofi/kofi_donate_1.svg' alt='Support me on Ko-fi' height='48'></a>
+
 ## Changelog
 
 <table>
