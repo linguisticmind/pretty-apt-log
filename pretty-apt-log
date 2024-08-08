@@ -18,10 +18,12 @@
 
 version=0.1.1
 
+script_name="${BASH_SOURCE##*/}"
+
 function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$\/[]/\\&/g'; }
 
 getopt -T > /dev/null
-[[ $? != 4 ]] && { printf '[%s] %s\n' "${BASH_SOURCE##*/}" 'Enhanced getopt is required to run this script.' >&2; exit 1; }
+[[ $? != 4 ]] && { printf '[%s] %s\n' "$script_name" 'Enhanced getopt is required to run this script.' >&2; exit 1; }
 
 help='pretty-apt-log [<options>] [<log> ...]
 
@@ -104,7 +106,7 @@ help='pretty-apt-log [<options>] [<log> ...]
         Print version information.
 '
 
-opts=$(getopt -n "${BASH_SOURCE##*/}" -o 'i,I,u,U,n,N,d,D,a,A,f:,z:,t:,p::,P,e,E,c,C,h,V,' -l 'os-installer,no-os-installer,user,no-user,user-uid,user-no-uid,details,no-details,details-current-architecture,details-no-current-architecture,date-format:,date-timezone:,bat-theme:,pager::,no-pager,pager-scroll-to-end,no-pager-scroll-to-end,color,no-color,help,version,' -- "$@")
+opts=$(getopt -n "$script_name" -o 'i,I,u,U,n,N,d,D,a,A,f:,z:,t:,p::,P,e,E,c,C,h,V,' -l 'os-installer,no-os-installer,user,no-user,user-uid,user-no-uid,details,no-details,details-current-architecture,details-no-current-architecture,date-format:,date-timezone:,bat-theme:,pager::,no-pager,pager-scroll-to-end,no-pager-scroll-to-end,color,no-color,help,version,' -- "$@")
 
 [[ $? != 0 ]] && exit 1
 
@@ -143,7 +145,7 @@ while true; do
       opt_pager="${2:-always}"
       case $opt_pager in
         auto | always | never ) ;;
-        * ) printf '%s\n' '['"${BASH_SOURCE##*/}"'] Invalid optional argument to `'"$1"'`: `'"$2"'`. Allowed values are: `always`, `auto`, `never`. No argument is equivalent to `always`.' >&2; exit 1 ;;
+        * ) printf '%s\n' '['"$script_name"'] Invalid optional argument to `'"$1"'`: `'"$2"'`. Allowed values are: `always`, `auto`, `never`. No argument is equivalent to `always`.' >&2; exit 1 ;;
       esac
       shift 2
     ;;
@@ -155,7 +157,7 @@ while true; do
     -h | --help ) printf '%s\n' "$help"; exit ;;
     -V | --version ) printf '%s\n' "$version"; exit ;;
     -- ) shift; break ;;
-    * ) printf '[%s] %s\n' "${BASH_SOURCE##*/}" 'Internal error: unable to parse option `'"$1"'`.' >&2; exit 1 ;;
+    * ) printf '[%s] %s\n' "$script_name" 'Internal error: unable to parse option `'"$1"'`.' >&2; exit 1 ;;
   esac
 done
 
@@ -170,7 +172,7 @@ sed_script='
   /^Start-Date:/ {
     :a
     /^Start-Date:/ {
-      s/^Start-Date: (.*)/TZ='\'"${opt_date_timezone//\'/\'\\\'\'}"\'' date +'\'"${opt_date_format//\'/\'\\\'\'}"\'' --date '\''\1 utc'\''/e
+      s/^Start-Date: (.*)/TZ='"${opt_date_timezone@Q}"' date +'"${opt_date_format@Q}"' --date '\''\1 utc'\''/e
       H
     }
     /^Commandline:/ {
@@ -215,7 +217,7 @@ sed_script='
 
 sed_script+='
     /^End-Date:/ {
-      s/^End-Date: (.*)/TZ='\'"${opt_date_timezone//\'/\'\\\'\'}"\'' date +'\'"${opt_date_format//\'/\'\\\'\'}"\'' --date '\''\1 utc'\''/e
+      s/^End-Date: (.*)/TZ='"${opt_date_timezone@Q}"' date +'"${opt_date_format@Q}"' --date '\''\1 utc'\''/e
       H
     }
     $ ! {
@@ -263,7 +265,7 @@ function bat_or_cat {
     bat_bin=
   done
 
-  function bat_run { "$bat_bin" --style=plain --color=never ${opt_color:+--color=always} --language=bash --theme="${opt_bat_theme//\'/\'\\\'\'}" "$@"; }
+  function bat_run { "$bat_bin" --style=plain --color=never ${opt_color:+--color=always} --language=bash --theme="${opt_bat_theme@Q}" "$@"; }
 
   if [[ $bat_bin ]]; then
     if [[ ! $opt_pager_scroll_to_end ]]; then
