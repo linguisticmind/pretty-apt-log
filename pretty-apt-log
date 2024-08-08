@@ -287,7 +287,7 @@ function bat_or_cat {
 
 }
 
-if [[ $# = 0 ]]; then
+if [[ $# == 0 ]]; then
 
   sed -En "$sed_script" \
     <(compgen -G '/var/log/apt/history.log.*.gz' && printf '%s\n' '/var/log/apt/history.log.'*'.gz' | sort --version-sort --reverse | xargs zcat) \
@@ -297,7 +297,7 @@ else
 
   for file; do
 
-    if [[ $file = *.gz ]]; then
+    if [[ $file == *.gz ]]; then
       zcat "$file"
     else
       cat "$file"
