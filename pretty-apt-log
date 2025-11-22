@@ -265,7 +265,7 @@ function bat_or_cat {
     bat_bin=
   done
 
-  function bat_run { "$bat_bin" --style=plain --color=never ${opt_color:+--color=always} --language=bash --theme="${opt_bat_theme@Q}" "$@"; }
+  function bat_run { "$bat_bin" --style=plain --color=never ${opt_color:+--color=always} --language=bash --theme="$opt_bat_theme" "$@"; }
 
   if [[ $bat_bin ]]; then
     if [[ ! $opt_pager_scroll_to_end ]]; then
